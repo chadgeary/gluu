@@ -75,7 +75,7 @@
         yum -y install python2-certbot-apache memcached
         # gluu setup
         cd /install/community-edition-setup
-        echo "{{ short_name }}
+        echo "{{ domain_name }}
         {{ friendly_name }}
         {{ gluu_admin_file.stdout }}
         Yes
