@@ -23,17 +23,10 @@
         group: root
         mode: '0444'
 
-    - name: get repo key
-      get_url:
-        url: https://repo.gluu.org/centos/RPM-GPG-KEY-GLUU
-        dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-GLUU
-        owner: root
-        group: root
-        mode: '0444'
-
     - name: import key
-      shell: |
-        rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-GLUU
+      rpm_key:
+        state: present
+        key: https://repo.gluu.org/centos/RPM-GPG-KEY-GLUU
 
     - name: install required packages
       yum:
