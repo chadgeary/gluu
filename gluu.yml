@@ -52,7 +52,7 @@
         echo -n $(openssl rand -base64 32) > /etc/gluu_admin
         chmod 400 /etc/gluu_admin
       no_log: True
-      when: gluu_admin_file.exists == false
+      when: gluu_admin_file.stat.exists == false
 
     - name: register gluu admin credential
       shell: |
