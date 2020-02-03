@@ -77,7 +77,6 @@
         systemd-run --machine=gluu_server /usr/local/bin/{{ item }}
       with_items:
         - gluu-server-setup
-        - gluu-certificate-setup
       ignore_errors: True
       args:
         executable: /bin/bash
