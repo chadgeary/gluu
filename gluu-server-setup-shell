@@ -41,3 +41,7 @@ echo "0 4 1 */2 * /usr/local/bin/gluu_certbot_renew" > /var/spool/cron/root
 
 # touch done file
 touch /opt/gluu-server-setup-done
+
+# start httpd
+systemctl start httpd
+
