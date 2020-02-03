@@ -83,3 +83,7 @@
         systemd-run --unit={{ item }} --machine=gluu_server --remain-after-exit /usr/local/bin/{{ item }}
       with_items:
         - gluu-server-setup-shell
+
+    - name: restart gluu service
+      systemd: systemd-nspawn@gluu_server.service
+      state: restarted
