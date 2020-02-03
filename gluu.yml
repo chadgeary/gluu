@@ -76,7 +76,7 @@
         machinectl copy-to gluu_server /usr/local/bin/{{ item }} /usr/local/bin/{{ item }}
       with_items:
         - gluu-server-setup-shell
-          gluu-server-setup-expect
+        - gluu-server-setup-expect
 
     - name: run gluu-server-setup-shell
       shell: |
