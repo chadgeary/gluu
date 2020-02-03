@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# install packages
+yum -y install expect memcached python2-certbot-apache
+
+# launch expect
+/usr/local/bin/gluu-server-setup-expect

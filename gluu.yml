@@ -76,7 +76,8 @@
         machinectl copy-to gluu_server /usr/local/bin/{{ item }} /usr/local/bin/{{ item }}
         systemd-run --machine=gluu_server /usr/local/bin/{{ item }}
       with_items:
-        - gluu-server-setup
+        - gluu-server-setup-shell
+        - gluu-server-setup-expect
       ignore_errors: True
       args:
         executable: /bin/bash
