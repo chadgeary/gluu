@@ -1,0 +1,24 @@
+#!/bin/bash
+# certbot prep
+systemctl stop httpd
+mv /etc/certs/httpd.crt /etc/certs/httpd.crt.beforecertbot
+mv /etc/certs/httpd.key /etc/certs/httpd.key.beforecertbot
+cp /opt/amazon-corretto*-linux-x64/jre/lib/security/cacerts /opt/amazon-corretto*-linux-x64/jre/lib/security/cacerts.beforecertbot
+
+# certbot generate
+certbot certonly --standalone --agree-tos --email {{ certbot_email }} --domains {{ friendly_name }}
+ln -s /etc/letsencrypt/live/sso.chadg.net/fullchain.pem /etc/certs/httpd.crt
+ln -s /etc/letsencrypt/live/sso.chadg.net/privkey.pem /etc/certs/httpd.key
+
+# certbot import
+openssl x509 -outform der -in /etc/certs/httpd.crt -out /etc/certs/httpd.der
+/opt/amazon-corretto*-linux-x64/bin/keytool -delete -alias {{ friendly_name }}_httpd -keystore /opt/amazon-corretto*-linux-x64/jre/lib/security/cacerts -storepass changeit
+/opt/amazon-corretto*-linux-x64/bin/keytool -importcert -noprompt -file /etc/certs/httpd.der -keystore /opt/amazon-corretto*-linux-x64/jre/lib/security/cacerts -alias {{ friendly_name }}_httpd -storepass changeit
+
+# renewal cron script
+echo "certbot renew
+openssl x509 -outform der -in /etc/certs/httpd.crt -out /etc/certs/httpd.der
+/opt/amazon-corretto*-linux-x64/bin/keytool -delete -alias {{ friendly_name }}_httpd -keystore /opt/amazon-corretto*-linux-x64/jre/lib/security/cacerts -storepass changeit
+/opt/amazon-corretto*-linux-x64/bin/keytool -importcert -noprompt -file /etc/certs/httpd.der -keystore /opt/amazon-corretto*-linux-x64/jre/lib/security/cacerts -alias {{ friendly_name }}_httpd -storepass changeit" > /usr/local/bin/gluu_certbot_renew
+chmod 500 /usr/local/bin/gluu_certbot_renew
+echo "0 4 1 */2 * /usr/local/bin/gluu_certbot_renew" > /var/spool/cron/root

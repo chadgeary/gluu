@@ -60,48 +60,25 @@
       no_log: True
       register: gluu_admin_credential
 
-    - name: gluu setup
+    - name: gluu-server/certificate-setup scripts
+      template:
+        src: "{{ item }}"
+        dest: "/usr/local/bin/{{ item }}"
+        owner: root
+        group: root
+        mode: '0500'
+      with_items:
+        - gluu-server-setup
+        - gluu-certificate-setup
+
+    - name: copy and run scripts in container
       shell: |
-        # login
-        /sbin/gluu-serverd login
-        # install packages
-        yum -y install python2-certbot-apache memcached
-        # gluu setup
-        cd /install/community-edition-setup
-        echo "{{ domain_name }}
-        {{ friendly_name }}
-        {{ gluu_admin_credential.stdout }}
-        Yes
-        Yes
-        Yes
-        Yes
-        Yes
-        No
-        No
-        Y" | ./setup.py
-        # certbot prep
-        systemctl stop httpd
-        mv /etc/certs/httpd.crt /etc/certs/httpd.crt.beforecertbot
-        mv /etc/certs/httpd.key /etc/certs/httpd.key.beforecertbot
-        cp /opt/amazon-corretto*-linux-x64/jre/lib/security/cacerts /opt/amazon-corretto*-linux-x64/jre/lib/security/cacerts.beforecertbot
-        # certbot generate
-        certbot certonly --standalone --agree-tos --email {{ certbot_email }} --domains {{ friendly_name }}
-        ln -s /etc/letsencrypt/live/sso.chadg.net/fullchain.pem /etc/certs/httpd.crt
-        ln -s /etc/letsencrypt/live/sso.chadg.net/privkey.pem /etc/certs/httpd.key
-        # certbot import
-        openssl x509 -outform der -in /etc/certs/httpd.crt -out /etc/certs/httpd.der
-        /opt/amazon-corretto*-linux-x64/bin/keytool -delete -alias {{ friendly_name }}_httpd -keystore /opt/amazon-corretto*-linux-x64/jre/lib/security/cacerts -storepass changeit
-        /opt/amazon-corretto*-linux-x64/bin/keytool -importcert -noprompt -file /etc/certs/httpd.der -keystore /opt/amazon-corretto*-linux-x64/jre/lib/security/cacerts -alias {{ friendly_name }}_httpd -storepass changeit
-        # renewal cron script
-        echo "certbot renew
-        openssl x509 -outform der -in /etc/certs/httpd.crt -out /etc/certs/httpd.der
-        /opt/amazon-corretto*-linux-x64/bin/keytool -delete -alias {{ friendly_name }}_httpd -keystore /opt/amazon-corretto*-linux-x64/jre/lib/security/cacerts -storepass changeit
-        /opt/amazon-corretto*-linux-x64/bin/keytool -importcert -noprompt -file /etc/certs/httpd.der -keystore /opt/amazon-corretto*-linux-x64/jre/lib/security/cacerts -alias {{ friendly_name }}_httpd -storepass changeit" > /usr/local/bin/gluu_certbot_renew
-        chmod 500 /usr/local/bin/gluu_certbot_renew
-        echo "0 4 1 */2 * /usr/local/bin/gluu_certbot_renew" > /var/spool/cron/root
-        logout
-        # restart service
-        systemctl restart systemd-nspawn@gluu_server.service 
+        machinectl copy-to gluu_server /usr/local/bin/{{ item }} /usr/local/bin/{{ item }}
+        systemd-run --machine=gluu_server /usr/local/bin/{{ item }}
+      with_items:
+        - gluu-server-setup
+        - gluu-certificate-setup
+      ignore_errors: True
       args:
         executable: /bin/bash
         warn: no
