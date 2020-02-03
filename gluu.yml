@@ -68,8 +68,9 @@
         group: root
         mode: '0500'
       with_items:
-        - gluu-server-setup
-        - gluu-certificate-setup
+        - gluu-server-setup-shell
+        - gluu-server-setup-expect
+        - gluu-server-setup-certificate
 
     - name: copy and run scripts in container
       shell: |
