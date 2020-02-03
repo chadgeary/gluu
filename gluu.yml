@@ -70,7 +70,7 @@
         cd /install/community-edition-setup
         echo "{{ domain_name }}
         {{ friendly_name }}
-        {{ gluu_admin_file.stdout }}
+        {{ gluu_admin_credential.stdout }}
         Yes
         Yes
         Yes
