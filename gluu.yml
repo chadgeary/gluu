@@ -70,16 +70,16 @@
       with_items:
         - gluu-server-setup-shell
         - gluu-server-setup-expect
-        - gluu-server-setup-certificate
 
-    - name: copy and run scripts in container
+    - name: copy scripts to container
       shell: |
         machinectl copy-to gluu_server /usr/local/bin/{{ item }} /usr/local/bin/{{ item }}
-        systemd-run --machine=gluu_server /usr/local/bin/{{ item }}
       with_items:
         - gluu-server-setup-shell
-        - gluu-server-setup-expect
-      ignore_errors: True
-      args:
-        executable: /bin/bash
-        warn: no
+          gluu-server-setup-expect
+
+    - name: run gluu-server-setup-shell
+      shell: |
+        systemd-run --unit={{ item }} --machine=gluu_server --remain-after-exit /usr/local/bin/{{ item }}
+      with_items:
+        - gluu-server-setup-shell
