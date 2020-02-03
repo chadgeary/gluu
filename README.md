@@ -7,7 +7,7 @@ Installation of the Gluu service on Centos 7 (or RHEL7) with a LetsEncrypt-signe
 
 # Deployment
 ```
-ansible-playbook gluu.yml --extra-vars "friendly_name=sso.chadg.net domain_name=chadg.net certbot_email=chad@chadg.net"
+ansible-playbook gluu.yml --extra-vars "target=localhost friendly_name=sso.chadg.net domain_name=chadg.net certbot_email=chad@chadg.net"
 ```
 
 # Todo

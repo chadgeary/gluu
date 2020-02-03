@@ -1,6 +1,6 @@
 ---
 - name: gluu
-  hosts: localhost
+  hosts: {{ target }}
   connection: local
   become: True
   become_user: root
